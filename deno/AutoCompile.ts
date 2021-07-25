@@ -48,8 +48,8 @@ async function compile(fileName : string) : Promise<boolean>{
       // Or you point to a *.ts file and you list all settings on the command line.
       cmd: bashify("tsc", "--module", "esnext", "--removeComments", "--sourceMap", fileName),
       //cmd: bashify("echo", fileName, "abcdef", "\"", "`'#$!🤞", "back \\ slash", "top\nbottom"),
-      stdout: "piped",
-      stderr: "piped",
+      //stdout: "piped",
+      //stderr: "piped",
     });
     const output = await cmd.output() // "piped" must be set
     const outStr = decoder.decode(output);
@@ -109,6 +109,7 @@ export async function addTsCompiler(fileName : string, request : AugmentedReques
   let needToCompile : boolean;
   if (!destinationInfo) {
     // Source exists, but not destination.
+    console.log("Compile needed but not available.  " + sourceFileName + " exists but " + fileName + " does not.  🤞"); 
     needToCompile = true;
   } else if (!(sourceInfo.mtime && destinationInfo.mtime)) {
     // We don't have timestamps so we can't say for sure.
@@ -117,12 +118,19 @@ export async function addTsCompiler(fileName : string, request : AugmentedReques
   } else {
     // If the source file was modified after the last build, rebuild.
     needToCompile = sourceInfo.mtime > destinationInfo.mtime;
+    if (needToCompile) {
+      console.log("Compile needed but not available.  " + sourceFileName + "’s mtime = " + sourceInfo.mtime
+      + ".  " + fileName + "’s mtime = " + destinationInfo.mtime + ".  Difference = " 
+      + (sourceInfo.mtime.getTime() - destinationInfo.mtime.getTime()) + "ms.  🤞");
+    }
   }
+  /*
   if (needToCompile && !await compile(sourceFileName)) {
     // Compile was required but failed.  Report an error.
     request.respond({status: 500, body: "Compile failed."});
     return true;
   }
+  */
   // If there was something we needed to do, we've done it.  Now
   // pass control back to the file handler so it can send the
   // requested file.
