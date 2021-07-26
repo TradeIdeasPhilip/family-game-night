@@ -8,14 +8,14 @@ import {
   isWebSocketCloseEvent,
   isWebSocketPingEvent,
   WebSocket,
-WebSocketEvent,
+  WebSocketEvent,
 } from "https://deno.land/std/ws/mod.ts";
 
 const webServer: WebServer = new WebServer();
 
 const textEncoder = new TextEncoder();
 
-async function readerToString(reader : Deno.Reader) {
+async function readerToString(reader: Deno.Reader) {
   let result = "";
   const buffer = new Uint8Array(5);
   const decoder = new TextDecoder();
@@ -25,51 +25,58 @@ async function readerToString(reader : Deno.Reader) {
       break;
     }
     const viewOfBytesRead = new Uint8Array(buffer.buffer, 0, numberOfBytesRead);
-    result += decoder.decode(viewOfBytesRead, { stream: true});
+    result += decoder.decode(viewOfBytesRead, { stream: true });
   }
   result += decoder.decode();
   return result;
 }
 
-function isNumericArray(value : any) : value is number[] {
+function isNumericArray(value: any): value is number[] {
   if (!(value instanceof Array)) {
     return false;
   }
-  return !value.some(element => typeof element != "number");
+  return !value.some((element) => typeof element != "number");
 }
 
-function isStringArray(value : any) : value is string[] {
+function isStringArray(value: any): value is string[] {
   if (!(value instanceof Array)) {
     return false;
   }
-  return !value.some(element => typeof element != "string");
+  return !value.some((element) => typeof element != "string");
 }
 
 let nextPlayerId = 1;
 const allPlayers = new Map<number, string>();
 
-webServer.addFileHandler("/static", "../everything-else/visible-to-web/", addTsCompiler);
-webServer.addPrefixAction("/js-bin/start-new-game", async (request: AugmentedRequest, remainder: string) => {
-  // TODO Add an exception handler!
-  const requestBody = await readerToString(request.body);
-  console.log({requestBody});
-  const playerNames = JSON.parse(requestBody);
-  if (!isStringArray(playerNames)) {
-    throw new Error("invalid input");
+webServer.addFileHandler(
+  "/static",
+  "../everything-else/visible-to-web/",
+  addTsCompiler
+);
+webServer.addPrefixAction(
+  "/js-bin/start-new-game",
+  async (request: AugmentedRequest, remainder: string) => {
+    // TODO Add an exception handler!
+    const requestBody = await readerToString(request.body);
+    console.log({ requestBody });
+    const playerNames = JSON.parse(requestBody);
+    if (!isStringArray(playerNames)) {
+      throw new Error("invalid input");
+    }
+    if (playerNames.length < 2) {
+      throw new Error("invalid input");
+    }
+    const result = { success: true, nameToUrl: {} as Record<string, string> };
+    playerNames.forEach((playerName) => {
+      const idNumber = nextPlayerId;
+      nextPlayerId++;
+      allPlayers.set(idNumber, playerName);
+      result.nameToUrl[playerName] = "./PlayCrazy8s.html?id=" + idNumber;
+    });
+    request.respond({ body: JSON.stringify(result) });
+    return true;
   }
-  if (playerNames.length < 2) {
-    throw new Error("invalid input");
-  }
-  const result = {success : true, nameToUrl : {} as Record<string, string>};
-  playerNames.forEach(playerName => {
-    const idNumber = nextPlayerId;
-    nextPlayerId++;
-    allPlayers.set(idNumber, playerName);
-    result.nameToUrl[playerName] = "./PlayCrazy8s.html?id=" + idNumber;
-  });
-  request.respond({body: JSON.stringify(result)});
-  return true;
-});
+);
 ///js-bin/greet?encrypted_name
 webServer.addPrefixAction("/streaming", async (request, remainder) => {
   const { conn, r: bufReader, w: bufWriter, headers } = request;
@@ -80,8 +87,13 @@ webServer.addPrefixAction("/streaming", async (request, remainder) => {
     headers,
   })
     .then(async (webSocket) => {
-      console.log("opened new web socket", request.path, request.searchParams, remainder);
-      for await  (const ev of webSocket) {
+      console.log(
+        "opened new web socket",
+        request.path,
+        request.searchParams,
+        remainder
+      );
+      for await (const ev of webSocket) {
         console.log("webSocket event", ev);
         const echoRequest = EchoRequest.tryDecode(ev);
         if (echoRequest) {
@@ -107,7 +119,7 @@ webServer.addPrefixAction("/streaming", async (request, remainder) => {
       await request.respond({ status: 400 });
     });
   return true;
-})
+});
 webServer.start();
 
 console.log("running out of", Deno.cwd());

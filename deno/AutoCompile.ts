@@ -1,8 +1,8 @@
 import { AugmentedRequest, WebServer } from "./Dispatcher.ts";
 
-function bashQuote(args : string[]) : string {
+function bashQuote(args: string[]): string {
   let result = "";
-  args.forEach(arg => {
+  args.forEach((arg) => {
     if (result != "") {
       result += " ";
     }
@@ -22,7 +22,7 @@ function bashQuote(args : string[]) : string {
  * @param args The command you want to execute followed by its arguments.  E.g. `["tsc", "../lib dir/ts/my file.ts"]`
  * @returns A list suitable for giving to Deno.run().  E.g. `["bash", "-c", "\"tsc\" \"../lib dir/ts/my file.ts\""]`
  */
-function bashify(...args : string[]) : string[] {
+function bashify(...args: string[]): string[] {
   // I'm not sure why this is required.
   // tsc works fine from the git bash prompt and from the DOS prompt.
   // But I get file not found when I try to run it directly from Deno.run().
@@ -38,7 +38,7 @@ const decoder = new TextDecoder();
  * @param fileName The TypeScript file to compile.
  * @returns true on success.
  */
-async function compile(fileName : string) : Promise<boolean>{
+async function compile(fileName: string): Promise<boolean> {
   console.log(compile, "🤞");
   try {
     const cmd = Deno.run({
@@ -46,24 +46,31 @@ async function compile(fileName : string) : Promise<boolean>{
       // But that's not how tsc works.
       // Either you point to a tsconfig file and compile the entire project.
       // Or you point to a *.ts file and you list all settings on the command line.
-      cmd: bashify("tsc", "--module", "esnext", "--removeComments", "--sourceMap", fileName),
+      cmd: bashify(
+        "tsc",
+        "--module",
+        "esnext",
+        "--removeComments",
+        "--sourceMap",
+        fileName
+      ),
       //cmd: bashify("echo", fileName, "abcdef", "\"", "`'#$!🤞", "back \\ slash", "top\nbottom"),
       stdout: "piped",
       stderr: "piped",
     });
-    const output = await cmd.output() // "piped" must be set
+    const output = await cmd.output(); // "piped" must be set
     const outStr = decoder.decode(output);
     const error = await cmd.stderrOutput();
-    const errorStr = new TextDecoder().decode(error); 
+    const errorStr = new TextDecoder().decode(error);
     const success = (await cmd.status()).success;
     cmd.close();
     // Need TODO a better job of error handling.  I think the success variable is correct, but I
     // want to double check.  Once that's done, clean up the output.  Report a lot fewer details
     // on success.
-    console.log({compile, fileName, outStr, errorStr, success});
+    console.log({ compile, fileName, outStr, errorStr, success });
     return true;
   } catch (ex) {
-    console.log({ex, fileName});
+    console.log({ ex, fileName });
     return false;
   }
 }
@@ -72,7 +79,7 @@ async function compile(fileName : string) : Promise<boolean>{
  * @param fileName The file you want information about.
  * @returns The results of Deno.stat() on success, or undefined on failure.
  */
-async function stat(fileName : string) : Promise<Deno.FileInfo | undefined> {
+async function stat(fileName: string): Promise<Deno.FileInfo | undefined> {
   try {
     return await Deno.stat(fileName);
   } catch (ex) {
@@ -90,7 +97,10 @@ async function stat(fileName : string) : Promise<Deno.FileInfo | undefined> {
  * @param request The original request.
  * @returns True if we responded, false if someone else needs to respond.
  */
-export async function addTsCompiler(fileName : string, request : AugmentedRequest) : Promise<boolean> {
+export async function addTsCompiler(
+  fileName: string,
+  request: AugmentedRequest
+): Promise<boolean> {
   const match = /^(.*\.)((js)|(js.map))$/.exec(fileName);
   if (!match) {
     // We only handle those two file extensions.
@@ -106,22 +116,42 @@ export async function addTsCompiler(fileName : string, request : AugmentedReques
     return false;
   }
   const destinationInfo = await stat(fileName);
-  let needToCompile : boolean;
+  let needToCompile: boolean;
   if (!destinationInfo) {
     // Source exists, but not destination.
-    console.log("Compile needed but not available.  " + sourceFileName + " exists but " + fileName + " does not.  🤞"); 
+    console.log(
+      "Compile needed but not available.  " +
+        sourceFileName +
+        " exists but " +
+        fileName +
+        " does not.  🤞"
+    );
     needToCompile = true;
   } else if (!(sourceInfo.mtime && destinationInfo.mtime)) {
     // We don't have timestamps so we can't say for sure.
-    console.log({warning: "can't read file times", sourceInfo, destinationInfo });
+    console.log({
+      warning: "can't read file times",
+      sourceInfo,
+      destinationInfo,
+    });
     needToCompile = false;
   } else {
     // If the source file was modified after the last build, rebuild.
     needToCompile = sourceInfo.mtime > destinationInfo.mtime;
     if (needToCompile) {
-      console.log("Compile needed but not available.  " + sourceFileName + "’s mtime = " + sourceInfo.mtime
-      + ".  " + fileName + "’s mtime = " + destinationInfo.mtime + ".  Difference = " 
-      + (sourceInfo.mtime.getTime() - destinationInfo.mtime.getTime()) + "ms.  🤞");
+      console.log(
+        "Compile needed but not available.  " +
+          sourceFileName +
+          "’s mtime = " +
+          sourceInfo.mtime +
+          ".  " +
+          fileName +
+          "’s mtime = " +
+          destinationInfo.mtime +
+          ".  Difference = " +
+          (sourceInfo.mtime.getTime() - destinationInfo.mtime.getTime()) +
+          "ms.  🤞"
+      );
     }
   }
   /*

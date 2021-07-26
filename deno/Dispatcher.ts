@@ -6,7 +6,6 @@
 
 import { serve, ServerRequest } from "https://deno.land/std/http/server.ts";
 
-
 export type AugmentedRequest = ServerRequest & {
   path: string;
   searchParams: URLSearchParams;
@@ -18,9 +17,15 @@ export type AugmentedRequest = ServerRequest & {
 
 type Action = (request: AugmentedRequest) => Promise<boolean>;
 
-type PrefixAction = (request: AugmentedRequest, remainder: string) => Promise<boolean>;
+type PrefixAction = (
+  request: AugmentedRequest,
+  remainder: string
+) => Promise<boolean>;
 
-type FilePreviewAction = (fileName : string, request: AugmentedRequest) => Promise<boolean>;
+type FilePreviewAction = (
+  fileName: string,
+  request: AugmentedRequest
+) => Promise<boolean>;
 
 export class WebServer {
   private static readonly BREAK_QUERY_STRING = /^([^?]*)(\??.*)$/;
@@ -36,7 +41,7 @@ export class WebServer {
    * handleRequest() returns a promise but there's no good reason to wait on it.
    * @param request Respond to this request one way or another.
    */
-  private async handleRequest(request : AugmentedRequest) {
+  private async handleRequest(request: AugmentedRequest) {
     const regexpResult = WebServer.BREAK_QUERY_STRING.exec(request.url)!;
     request.path = WebServer.sanitize(regexpResult[1]);
     console.log(request.path, new Date());
@@ -85,11 +90,18 @@ export class WebServer {
    * @param filePrefix Where to look for files.  e.g. "../everything-else/visible-to-web/" if you want to expose
    * ../everything-else/visible-to-web/index.html and ../everything-else/visible-to-web/ts/index.js.
    */
-  public addFileHandler(urlPrefix: string, filePrefix: string, preview? : FilePreviewAction): void {
+  public addFileHandler(
+    urlPrefix: string,
+    filePrefix: string,
+    preview?: FilePreviewAction
+  ): void {
     this.addPrefixAction(
       urlPrefix,
-      async (request: AugmentedRequest, remainder: string) : Promise<boolean> => {
-        async function tryOnce(localFileName : string) : Promise<boolean> {
+      async (
+        request: AugmentedRequest,
+        remainder: string
+      ): Promise<boolean> => {
+        async function tryOnce(localFileName: string): Promise<boolean> {
           try {
             const file = await Deno.open(localFileName);
             const headers = new Headers();
@@ -98,13 +110,13 @@ export class WebServer {
             }
             request.respond({ body: file, headers });
             return true;
-          } catch(ex) {
+          } catch (ex) {
             console.log("possible 404", localFileName);
             return false;
           }
         }
         const localFile = filePrefix + remainder;
-        if (preview && await preview(localFile, request)) {
+        if (preview && (await preview(localFile, request))) {
           // The preview action took care of the request.
           return true;
         }
@@ -112,13 +124,16 @@ export class WebServer {
           // Success!
           return true;
         }
-        if ((!/\/index.html$/.test(localFile)) && (await tryOnce(localFile + "/index.html"))) {
+        if (
+          !/\/index.html$/.test(localFile) &&
+          (await tryOnce(localFile + "/index.html"))
+        ) {
           // Success, after adding /index.html.
           return true;
         }
         console.log("404", localFile);
         return false;
-      },
+      }
     );
   }
   public start() {
@@ -129,11 +144,11 @@ export class WebServer {
 
   /**
    * Converts a path in a standard format.
-   * 
+   *
    * This is mostly aimed at safety.  You don't want someone to ask for the file
    * "/free_stuff/../../../../../etc/passwd".  That would be converted to "/etc/passwd".
    * We try to honor .. within the path.  "a/b/c/../d" => "/a/b/d".
-   * 
+   *
    * Converts backslash to slash.  Removes duplicate slashes.  Removes "." directory references.
    * The result always starts with a slash.  The result only ends in a slash if the entire string
    * is "/".
@@ -150,7 +165,7 @@ export class WebServer {
         // Remove these immediately.
         // If we are already at the top, ignore this.
         final.pop();
-      } else if ((segment == ".") || (segment == "")) {
+      } else if (segment == "." || segment == "") {
         // Explicitly ignore.
         // /// => /
         // /././ => /
@@ -175,15 +190,15 @@ export class WebServer {
 
   /**
    * Returns undefined if prefix is not a prefix of path.
-   * 
-   * We assume that prefix is a directory name.  We only report a match if 
+   *
+   * We assume that prefix is a directory name.  We only report a match if
    * the prefix is exactly the same as the path, or if the prefix is immediately
    * followed by a /.
-   * 
+   *
    * If the path is a match, we return the part of the match after the /, or just
    * "" if there was nothing after the prefix.  Warning, "" and undefined are both
    * considered false.
-   * 
+   *
    * Examples:
    * * ("/abc", "/ABC/DEF") => Undefined.  (Not an exact match.)
    * * ("/abc", "/abc/def") => "def"
@@ -202,7 +217,7 @@ export class WebServer {
       return;
     }
     const splitChar = path[prefix.length];
-    if ((splitChar != "/") && (splitChar !== undefined)) {
+    if (splitChar != "/" && splitChar !== undefined) {
       //console.log("exit 2", prefix, path, splitChar);
       return;
     }
@@ -230,8 +245,6 @@ export class WebServer {
     return headers;
   }
 }
-
-
 
 // TODO
 // AugmentedRequest should be a class.
