@@ -11,16 +11,10 @@
 				"kind": "build",
 				"isDefault": true
 			},
-			"label": "tsc: build - tsconfig.json",
-			"runOptions": {
+			"label": "tsc: build - tsconfig.json"
 				// Note:  Originally the deno server was going to take
 				// care of th automatic compiles, but I'm having trouble
 				// with that today.
-				
-				// Make sure that automatic tasks are enabled!
-				// https://stackoverflow.com/a/53755091/971955
-				"runOn": "folderOpen"
-			  }
 		}
 	]
 }

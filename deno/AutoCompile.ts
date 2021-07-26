@@ -48,8 +48,8 @@ async function compile(fileName : string) : Promise<boolean>{
       // Or you point to a *.ts file and you list all settings on the command line.
       cmd: bashify("tsc", "--module", "esnext", "--removeComments", "--sourceMap", fileName),
       //cmd: bashify("echo", fileName, "abcdef", "\"", "`'#$!🤞", "back \\ slash", "top\nbottom"),
-      //stdout: "piped",
-      //stderr: "piped",
+      stdout: "piped",
+      stderr: "piped",
     });
     const output = await cmd.output() // "piped" must be set
     const outStr = decoder.decode(output);

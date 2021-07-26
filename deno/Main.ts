@@ -15,13 +15,60 @@ const webServer: WebServer = new WebServer();
 
 const textEncoder = new TextEncoder();
 
+async function readerToString(reader : Deno.Reader) {
+  let result = "";
+  const buffer = new Uint8Array(5);
+  const decoder = new TextDecoder();
+  while (true) {
+    const numberOfBytesRead = await reader.read(buffer);
+    if (numberOfBytesRead === null) {
+      break;
+    }
+    const viewOfBytesRead = new Uint8Array(buffer.buffer, 0, numberOfBytesRead);
+    result += decoder.decode(viewOfBytesRead, { stream: true});
+  }
+  result += decoder.decode();
+  return result;
+}
+
+function isNumericArray(value : any) : value is number[] {
+  if (!(value instanceof Array)) {
+    return false;
+  }
+  return !value.some(element => typeof element != "number");
+}
+
+function isStringArray(value : any) : value is string[] {
+  if (!(value instanceof Array)) {
+    return false;
+  }
+  return !value.some(element => typeof element != "string");
+}
+
+let nextPlayerId = 1;
+const allPlayers = new Map<number, string>();
+
 webServer.addFileHandler("/static", "../everything-else/visible-to-web/", addTsCompiler);
-webServer.addPrefixAction("/js-bin/greet", (request: AugmentedRequest, remainder: string) => {
-  const encryptedName = request.searchParams.get("encrypted_name");
-  const name = encryptedName?tripleRot13(encryptedName):"<anonymous>";
-  const response = "Hello " + name + "  (" + copyrightString + ")";
-  request.respond({body: response});
-  return Promise.resolve(true);
+webServer.addPrefixAction("/js-bin/start-new-game", async (request: AugmentedRequest, remainder: string) => {
+  // TODO Add an exception handler!
+  const requestBody = await readerToString(request.body);
+  console.log({requestBody});
+  const playerNames = JSON.parse(requestBody);
+  if (!isStringArray(playerNames)) {
+    throw new Error("invalid input");
+  }
+  if (playerNames.length < 2) {
+    throw new Error("invalid input");
+  }
+  const result = {success : true, nameToUrl : {} as Record<string, string>};
+  playerNames.forEach(playerName => {
+    const idNumber = nextPlayerId;
+    nextPlayerId++;
+    allPlayers.set(idNumber, playerName);
+    result.nameToUrl[playerName] = "./PlayCrazy8s.html?id=" + idNumber;
+  });
+  request.respond({body: JSON.stringify(result)});
+  return true;
 });
 ///js-bin/greet?encrypted_name
 webServer.addPrefixAction("/streaming", async (request, remainder) => {

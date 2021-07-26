@@ -1,6 +1,9 @@
 {
+  // compileOnSave comes from https://github.com/microsoft/vscode/issues/31294
+  // I never got that feature to work.  😥
+    "compileOnSave": true,
     "compilerOptions": {
-      "target": "es5",
+      "target": "ESNext",
       "module": "ESNext",
       "sourceMap": true,
       "lib": ["ES2019", "DOM"],
