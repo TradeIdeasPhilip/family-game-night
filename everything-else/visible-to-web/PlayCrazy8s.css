@@ -1,3 +1,5 @@
+@import url("https://fonts.googleapis.com/css2?family=Zen+Tokyo+Zoo&display=swap");
+
 h1 {
   font-family: "Dancing Script", cursive;
 }
@@ -13,24 +15,97 @@ h1 {
 }
 .wild-card {
   animation: 10000s linear infinite wild-card;
-      background-image: repeating-linear-gradient(-30deg,
-    red 0 25%,
-    black 25% 50%);
+  background-image: repeating-linear-gradient(-30deg, red 0 25%, black 25% 50%);
   background-clip: text;
   -webkit-background-clip: text;
   color: transparent;
   font-weight: bold;
 }
-.wc1 {
-  background-image: repeating-linear-gradient(-30deg,
-red 0 0.1em,
-black 0.1em 0.2em);
-  color: white;
-  font-weight: bold;
+
+/* Adapted from https://codepen.io/jackrugile/pen/aLkxA */
+.one-card-left {
+  background: hsla(0, 0%, 0%, 0.9);
+  color: hsla(0, 0%, 0%, 0.9);
+  animation: move linear 2000ms infinite;
+  padding: 0 6px;
+  border-radius: 4px;
+  font-family: "Zen Tokyo Zoo", cursive;
 }
-td:nth-child(2), td:nth-child(3) {
+@keyframes move {
+  0% {
+    text-shadow: 4px -4px 0 hsla(0, 100%, 50%, 1),
+      3px -3px 0 hsla(0, 100%, 50%, 1), 2px -2px 0 hsla(0, 100%, 50%, 1),
+      1px -1px 0 hsla(0, 100%, 50%, 1), -4px 4px 0 hsla(180, 100%, 50%, 1),
+      -3px 3px 0 hsla(180, 100%, 50%, 1), -2px 2px 0 hsla(180, 100%, 50%, 1),
+      -1px 1px 0 hsla(180, 100%, 50%, 1);
+  }
+  25% {
+    text-shadow: -4px -4px 0 hsla(180, 100%, 50%, 1),
+      -3px -3px 0 hsla(180, 100%, 50%, 1), -2px -2px 0 hsla(180, 100%, 50%, 1),
+      -1px -1px 0 hsla(180, 100%, 50%, 1), 4px 4px 0 hsla(0, 100%, 50%, 1),
+      3px 3px 0 hsla(0, 100%, 50%, 1), 2px 2px 0 hsla(0, 100%, 50%, 1),
+      1px 1px 0 hsla(0, 100%, 50%, 1);
+  }
+  50% {
+    text-shadow: -4px 4px 0 hsla(0, 100%, 50%, 1),
+      -3px 3px 0 hsla(0, 100%, 50%, 1), -2px 2px 0 hsla(0, 100%, 50%, 1),
+      -1px 1px 0 hsla(0, 100%, 50%, 1), 4px -4px 0 hsla(180, 100%, 50%, 1),
+      3px -3px 0 hsla(180, 100%, 50%, 1), 2px -2px 0 hsla(180, 100%, 50%, 1),
+      1px -1px 0 hsla(180, 100%, 50%, 1);
+  }
+  75% {
+    text-shadow: 4px 4px 0 hsla(180, 100%, 50%, 1),
+      3px 3px 0 hsla(180, 100%, 50%, 1), 2px 2px 0 hsla(180, 100%, 50%, 1),
+      1px 1px 0 hsla(180, 100%, 50%, 1), -4px -4px 0 hsla(0, 100%, 50%, 1),
+      -3px -3px 0 hsla(0, 100%, 50%, 1), -2px -2px 0 hsla(0, 100%, 50%, 1),
+      -1px -1px 0 hsla(0, 100%, 50%, 1);
+  }
+  100% {
+    text-shadow: 4px -4px 0 hsla(0, 100%, 50%, 1),
+      3px -3px 0 hsla(0, 100%, 50%, 1), 2px -2px 0 hsla(0, 100%, 50%, 1),
+      1px -1px 0 hsla(0, 100%, 50%, 1), -4px 4px 0 hsla(180, 100%, 50%, 1),
+      -3px 3px 0 hsla(180, 100%, 50%, 1), -2px 2px 0 hsla(180, 100%, 50%, 1),
+      -1px 1px 0 hsla(180, 100%, 50%, 1);
+  }
+}
+
+table {
+  border: 0.2em solid;
+  border-radius: 0.5em;
+  /*border-collapse: collapse;*/
+  /* border-collapse breaks border-radius :( */
+  border-spacing: 0;
+}
+
+td,
+th {
+  padding: 0 0.25em;
+  border: 0.04em solid lightgray;
+}
+
+th {
+  border-top: none;
+}
+
+tr:last-child td {
+  border-bottom: none;
+}
+
+th:first-child,
+td:first-child {
+  border-left: none;
+}
+
+th:last-child,
+td:last-child {
+  border-right: none;
+}
+
+td:nth-child(2),
+td:nth-child(3) {
   text-align: right;
 }
+
 @keyframes wild-card {
   from {
     background-position: 0 0;
@@ -48,7 +123,7 @@ td:nth-child(2), td:nth-child(3) {
   flex-direction: column;
   align-items: center;
 }
-.my-card>div:nth-child(2) {
+.my-card > div:nth-child(2) {
   font-size: 1rem;
 }
 .my-card button {
@@ -56,6 +131,6 @@ td:nth-child(2), td:nth-child(3) {
   border-width: 1px;
 }
 #my-cards {
-  display:flex;
+  display: flex;
   flex-wrap: wrap;
 }
