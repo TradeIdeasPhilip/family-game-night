@@ -1,8 +1,6 @@
 import { addTsCompiler } from "./AutoCompile.ts";
 import { AugmentedRequest, WebServer } from "./Dispatcher.ts";
-import { tripleRot13 } from "./shared/high-security.ts";
-import { copyrightString, sleep } from "./shared/useful-stuff.ts";
-import { EchoRequest } from "./shared/web-socket-protocol.ts";
+import { sleep } from "./shared/useful-stuff.ts";
 import {
   acceptWebSocket,
   isWebSocketCloseEvent,
@@ -10,6 +8,7 @@ import {
   WebSocket,
   WebSocketEvent,
 } from "https://deno.land/std/ws/mod.ts";
+import { Game } from "./Crazy8s.ts";
 
 const webServer: WebServer = new WebServer();
 
@@ -45,9 +44,6 @@ function isStringArray(value: any): value is string[] {
   return !value.some((element) => typeof element != "string");
 }
 
-let nextPlayerId = 1;
-const allPlayers = new Map<number, string>();
-
 webServer.addFileHandler(
   "/static",
   "../everything-else/visible-to-web/",
@@ -67,18 +63,20 @@ webServer.addPrefixAction(
       throw new Error("invalid input");
     }
     const result = { success: true, nameToUrl: {} as Record<string, string> };
-    playerNames.forEach((playerName) => {
-      const idNumber = nextPlayerId;
-      nextPlayerId++;
-      allPlayers.set(idNumber, playerName);
-      result.nameToUrl[playerName] = "./PlayCrazy8s.html?id=" + idNumber;
+    const game = new Game(playerNames);
+    // TODO game object needs to be persistent.  The url should include enough info to efficiently find the game.
+    game.playerInfo.forEach((player) => {
+      result.nameToUrl[player.name] = "./PlayCrazy8s.html?id=" + player.id;
+      player.playerConnection = (toSend) => {
+        console.log({player : player.name, toSend /*: JSON.stringify(toSend)*/ });
+      }
     });
+    game.notifyAllGeneralInfo();
     request.respond({ body: JSON.stringify(result) });
     return true;
   }
 );
-///js-bin/greet?encrypted_name
-webServer.addPrefixAction("/streaming", async (request, remainder) => {
+webServer.addPrefixAction("/streaming/crazy-eights", async (request, remainder) => {
   const { conn, r: bufReader, w: bufWriter, headers } = request;
   acceptWebSocket({
     conn,
@@ -95,23 +93,6 @@ webServer.addPrefixAction("/streaming", async (request, remainder) => {
       );
       for await (const ev of webSocket) {
         console.log("webSocket event", ev);
-        const echoRequest = EchoRequest.tryDecode(ev);
-        if (echoRequest) {
-          (async () => {
-            for (let i = 0; i < echoRequest.repeatCount; i++) {
-              await sleep(echoRequest.delay);
-              //console.log({ i, echoRequest });
-              if (i % 2) {
-                // Odd Numbers
-                webSocket.send(textEncoder.encode(echoRequest.message));
-              } else {
-                // Even Numbers
-                webSocket.send(echoRequest.message);
-              }
-            }
-          })();
-          console.log("TODO handle echo request", echoRequest);
-        }
       }
     })
     .catch(async (err) => {
@@ -123,4 +104,4 @@ webServer.addPrefixAction("/streaming", async (request, remainder) => {
 webServer.start();
 
 console.log("running out of", Deno.cwd());
-console.log("Listening.", "http://127.0.0.1:9000/static/", copyrightString);
+console.log("Listening.", "http://127.0.0.1:9000/static/", new Date().toLocaleString());

@@ -16,7 +16,7 @@ Unfortunately that project is not ready for prime time yet.
 Somehow the automatic complier built into the server broke.
 For now I replaced that compiler with a warning message.
 If you try to read a `*.js` file that is older than the corresponding `*.ts` file, a message will appear in the server's debug console.
-I reconfigured the client project to automatically run typescript, so as long as you make changes from VS code (and you do the one time setup described in everything-else/.vscode/tasks.json) things should still work.
+~~I reconfigured the client project to automatically run typescript, so as long as you make changes from VS code (and you do the one time setup described in everything-else/.vscode/tasks.json) things should still work.~~
 
 ## Status
 Automatic compiles are completely broken.
