@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html>
   <head>
+    <meta charset="UTF-8">
     <title>Crazy 8's</title>
     <link rel="stylesheet" href="PlayCrazy8s.css" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -10,10 +11,70 @@
       rel="stylesheet"
     />
     <script type="module" src="PlayCrazy8s.js"></script>
+    
   </head>
   <body>
     <h1>Debug Information</h1>
     <div id="todo"></div>
+    <h1>Prototype</h1>
+    <div id="prototype">
+      Top Card:
+      7♠
+      <BR>
+        Top Card:
+      <SPAN CLASS="red-card">Q♥</SPAN>
+      <BR>
+        Top Card:
+      <SPAN CLASS="wild-card">8●</SPAN>
+      <BR>
+        Top Card:
+      <SPAN CLASS="wc1">8?</SPAN>
+        <TABLE>
+        <TR>
+          <TH>Name</TH><TH>Cards</TH><TH>Score</TH><TH>Last Seen</TH>
+        </TR>
+        <TR>
+          <TD>Zaede</TD><TD>3</TD><TD>0</TD><TD>Connected</TD>
+        </TR>
+        <TR>
+          <TD>Zack</TD><TD>5</TD><TD>-3</TD><TD>Never</TD>
+        </TR>
+        <TR>
+          <TD>David</TD><TD>15</TD><TD>-37</TD><TD>
+          <SCRiPT>
+            document.write( new Date().toLocaleTimeString());
+          </SCRiPT>
+        </TD>
+        </TR>
+        </TABLE>	
+      <div id="my-cards">
+        <div class ="my-card">
+          <div>7♠</div>
+          <div><button>Play</button></div>
+        </div>
+        <div class ="my-card">
+          <div CLASS="red-card">Q♥</div>
+          <div><button disabled>Skip Zack</button></div>
+        </div>
+        <div class ="my-card">
+          <div>2♣</div>
+          <div><button>Zack Draws 2</button></div>
+        </div>
+        <div class ="my-card">
+          <div CLASS="red-card">A♦</div>
+          <div><button>Reverse to David</button></div>
+        </div>
+        <div class ="my-card">
+          <div><span CLASS="wild-card">8●</span></div>
+          <div><button>♠</button> <button>♣</button> <button CLASS="red-card">♥</button> <button CLASS="red-card">♦</button></div>
+        </div>
+        <div class ="my-card">
+          <div>🙁</div>
+          <div><button>Draw</button></div>
+        </div>
+      </div>	
+    
+    </div>
     <h1>Rules</h1>
     <a href="https://www.pagat.com/eights/crazy8s.html">Rules</a>
   </body>

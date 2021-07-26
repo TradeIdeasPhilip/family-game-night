@@ -1,3 +1,61 @@
 h1 {
   font-family: "Dancing Script", cursive;
 }
+
+#prototype {
+  font-size: 200%;
+}
+.red-card {
+  color: red;
+}
+.strike-through {
+  text-decoration: line-through black solid;
+}
+.wild-card {
+  animation: 10000s linear infinite wild-card;
+      background-image: repeating-linear-gradient(-30deg,
+    red 0 25%,
+    black 25% 50%);
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+  font-weight: bold;
+}
+.wc1 {
+  background-image: repeating-linear-gradient(-30deg,
+red 0 0.1em,
+black 0.1em 0.2em);
+  color: white;
+  font-weight: bold;
+}
+td:nth-child(2), td:nth-child(3) {
+  text-align: right;
+}
+@keyframes wild-card {
+  from {
+    background-position: 0 0;
+  }
+  to {
+    background-position: 3333em 0;
+  }
+}
+.my-card {
+  border: 0.2em solid;
+  border-radius: 0.5em;
+  padding: 0.1em 0.2em;
+  margin: 0.1em;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.my-card>div:nth-child(2) {
+  font-size: 1rem;
+}
+.my-card button {
+  border-radius: 0.5em;
+  border-width: 1px;
+}
+#my-cards {
+  display:flex;
+  flex-wrap: wrap;
+}
