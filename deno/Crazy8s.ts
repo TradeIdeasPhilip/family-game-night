@@ -8,7 +8,7 @@ function shuffleArray<T>(array : T[]) {
   }
 }
 
-export type PlayerConnection = (toSend: GameStatus) => void;
+export type PlayerConnection = { send : (toSend: GameStatus) => void , cancel? : () => void };
 
 export type SimplePlayerInterface = {
   readonly id : number;
@@ -52,8 +52,12 @@ export class Game {
    * These will map to the playerNames provided in the constructor.
    * There will be the same number of these in the same order.
    */
-  public get playerInfo() : SimplePlayerInterface[] {
+  public get allPlayerInfo() : SimplePlayerInterface[] {
     return Array.from(this.players.values());
+  }
+
+  public getPlayerInfo(id : number) : SimplePlayerInterface | undefined {
+    return this.players.get(id);
   }
 
   private readonly playersInOrder : number[] = [];
@@ -110,7 +114,7 @@ export class Game {
         const cardStatus : CardStatus = { cards: player.cards.map(card => { return { card, buttons: [] }; }) };
         // TODO complete the cardStatus correctly.  Add buttons to the cards and optionally the draw button.
         gameStatus.cardStatus = cardStatus;
-        player.playerConnection(gameStatus);
+        player.playerConnection.send(gameStatus);
       } 
       // TODO send gameStatus to player.
     }
@@ -119,6 +123,9 @@ export class Game {
     const player = this.players.get(id);
     if (player) {
       this.notifyAllGeneralInfo(player);
+      return true;
+    } else {
+      return false;
     }
   }
   getPlayerAfter(player : Player) : Player {

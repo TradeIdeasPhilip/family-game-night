@@ -49,7 +49,7 @@ export class Card {
   ) {
     //
   }
-  static fromJson(json : JsonCard) : Card {
+  static fromJson(json: JsonCard): Card {
     return new Card(json.face, json.suit, json.sortOrder);
   }
   static createDeck(count = 1): Card[] {
@@ -93,26 +93,45 @@ export type JsonCard = {
 };
 
 export type JsonPlayer = {
-  name : string;
-  id : number;
-  cards : number;
-  score : number;
-  lastSeen : "Connected" | "Never" | Date;
-}
-
-export type ButtonStatus = {
-  card : JsonCard;
-  buttons : ([string] | [string, string])[];
-}
-
-export type CardStatus = {
-  cards : ButtonStatus[];
-  drawCode? : string;
-}
-
-export type GameStatus = {
-  topCard? : JsonCard;
-  playersInOrder? : JsonPlayer[];
-  cardStatus? : CardStatus;
+  name: string;
+  id: number;
+  cards: number;
+  score: number;
+  lastSeen: "Connected" | "Never" | Date;
 };
 
+export type ButtonStatus = {
+  card: JsonCard;
+  buttons: ([string] | [string, string])[];
+};
+
+export type CardStatus = {
+  cards: ButtonStatus[];
+  drawCode?: string;
+};
+
+export type GameStatus = {
+  topCard?: JsonCard;
+  playersInOrder?: JsonPlayer[];
+  cardStatus?: CardStatus;
+};
+
+/**
+ * I'm using this for invalid input.  E.g. the client specified an invalid player id.
+ * Source:  https://developer.mozilla.org/en-US/docs/Web/API/CloseEvent#properties
+ */
+export const WEB_SOCKET_CLOSE_UNSUPPORTED_DATA = 1003;
+
+/**
+ * I'm using this for random exceptions.  We can add more specific things, but this is the
+ * catchall for catching an exception and not knowing what else to do with it.
+ * Source:  https://developer.mozilla.org/en-US/docs/Web/API/CloseEvent#properties
+ */
+export const WEB_SOCKET_CLOSE_INTERNAL_ERROR = 1011;
+
+/**
+ * I'm using this when a user tries to make a second connection the server and the
+ * server closes down the first connection.
+ * More info:  https://developer.mozilla.org/en-US/docs/Web/API/CloseEvent#properties
+ */
+export const WEB_SOCKET_CLOSE_NO_RETRY = 4000;
