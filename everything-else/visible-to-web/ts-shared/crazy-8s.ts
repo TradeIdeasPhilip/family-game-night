@@ -39,7 +39,8 @@ const FACES: ReadonlyMap<Face, FaceInfo> = new Map([
   ["Q", { points: 10, isSkip: true }],
   ["K", { points: 10 }],
 ]);
-const NORMAL_SUITS = ["♠", "♥", "♦", "♣"] as const;
+
+export const NORMAL_SUITS = ["♠", "♥", "♦", "♣"] as const;
 
 export class Card {
   toString() {
@@ -109,9 +110,11 @@ export type JsonPlayer = {
   lastSeen: "Connected" | "Never" | Date;
 };
 
+export type SingleButton = [string] | [string, string];
+
 export type ButtonStatus = {
   card: JsonCard;
-  buttons: ([string] | [string, string])[];
+  buttons: SingleButton[];
 };
 
 export type CardStatus = {

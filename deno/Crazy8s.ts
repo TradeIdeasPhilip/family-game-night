@@ -1,4 +1,4 @@
-import { Card, CardStatus, GameStatus, JsonPlayer } from "./shared/crazy-8s.ts";
+import { ButtonStatus, Card, CardStatus, GameStatus, JsonPlayer, NORMAL_SUITS, SingleButton } from "./shared/crazy-8s.ts";
 
 // Adapted from https://stackoverflow.com/a/12646864/971955
 function shuffleArray<T>(array : T[]) {
@@ -107,13 +107,43 @@ export class Game {
   get topCard() : Card {
     return this.discardPile[this.discardPile.length - 1];
   }
+  /**
+   * This will store the action for later use by the client.
+   * @param action A callback to be performed if and when the client requests it.
+   * @returns A string that we can give to the client.  The client will use this to request the corresponding action.
+   */
+  private registerAction(action : () => void) : string {
+    return "TODO";
+  }
   notifyAllGeneralInfo(player? : Player | undefined) {
     const players : Iterable<Player> = player?[player]:this.players.values();
     const gameStatus : GameStatus = { topCard: this.topCard, playersInOrder : this.playersInOrder.map(id => this.players.get(id)!.export()) };
     for (const player of players) {
       if (player.playerConnection) {
-        const cardStatus : CardStatus = { cards: player.cards.map(card => { return { card, buttons: [["Play"]] }; }) };
-        // TODO complete the cardStatus correctly.  Add buttons to the cards and optionally the draw button.
+        const isThisPlayersTurn = player.id == this.playersInOrder[0];
+        const makeButton = (name : string, action : () => void) : SingleButton => {
+          if (isThisPlayersTurn) {
+            return [name, this.registerAction(action)];
+          } else {
+            return [name];
+          }
+        }
+        const cards : ButtonStatus[] = player.cards.map(card => {
+          let buttons : SingleButton[];
+          // TODO add actual actions.
+          // TODO add more special cases, e.g. reverse, skip, draw 2.
+          if (card.isWild) {
+            buttons = NORMAL_SUITS.map(suit => makeButton(suit, ()=> {console.log(`${player.name} is playing ${card.toString()} as a ${suit}`)}));
+          } else {
+            buttons = [makeButton("Play", () => {console.log(`${player.name} is playing ${card.toString()}`)})];
+          }
+          return { card, buttons };
+        });
+        const cardStatus : CardStatus = { cards };
+        if (isThisPlayersTurn) {
+          // TODO what about draw 2, draw 4, etc.
+          cardStatus.drawCode = this.registerAction(() => console.log(`${player.name} is drawing a card.`))
+        }
         gameStatus.cardStatus = cardStatus;
         player.playerConnection.send(gameStatus);
       } 
