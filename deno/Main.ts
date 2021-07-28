@@ -129,7 +129,9 @@ async function streamingCrazyEights(
           });
         },
         cancel() {
-          webSocket?.close(WEB_SOCKET_CLOSE_NO_RETRY);
+          if (webSocket && (!webSocket.isClosed)) {
+            webSocket.close(WEB_SOCKET_CLOSE_NO_RETRY);
+          }
         },
       };
       game?.sendUpdatedStatus(id);

@@ -99,6 +99,7 @@ export class Game {
       if (deal.length != cardsPerPlayer) {
         throw new Error("wtf");
       }
+      deal.sort((a, b) => a.sortOrder - b.sortOrder);
       players.set(id, new Player(name, id, deal));
       this.playersInOrder.push(id);
     })
@@ -111,7 +112,7 @@ export class Game {
     const gameStatus : GameStatus = { topCard: this.topCard, playersInOrder : this.playersInOrder.map(id => this.players.get(id)!.export()) };
     for (const player of players) {
       if (player.playerConnection) {
-        const cardStatus : CardStatus = { cards: player.cards.map(card => { return { card, buttons: [] }; }) };
+        const cardStatus : CardStatus = { cards: player.cards.map(card => { return { card, buttons: [["Play"]] }; }) };
         // TODO complete the cardStatus correctly.  Add buttons to the cards and optionally the draw button.
         gameStatus.cardStatus = cardStatus;
         player.playerConnection.send(gameStatus);

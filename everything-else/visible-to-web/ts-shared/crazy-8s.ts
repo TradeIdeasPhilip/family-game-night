@@ -42,6 +42,9 @@ const FACES: ReadonlyMap<Face, FaceInfo> = new Map([
 const NORMAL_SUITS = ["♠", "♥", "♦", "♣"] as const;
 
 export class Card {
+  toString() {
+    return this.face + this.suit;
+  }
   private constructor(
     readonly face: Face,
     readonly suit: Suit,
@@ -80,6 +83,12 @@ export class Card {
   }
   get isSkip() {
     return FACES.get(this.face)!.isSkip;
+  }
+  get isRed() {
+    return (this.suit == "♥") || (this.suit == "♦");
+  }
+  get isBlack() {
+    return (this.suit == "♠") || (this.suit == "♣");
   }
   get points() {
     return FACES.get(this.face)!.points;

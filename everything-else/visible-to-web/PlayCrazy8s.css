@@ -4,7 +4,7 @@ h1 {
   font-family: "Dancing Script", cursive;
 }
 
-#prototype {
+.main-body {
   font-size: 200%;
 }
 .red-card {
@@ -87,7 +87,7 @@ th {
   border-top: none;
 }
 
-tr:last-child td {
+tr:last-child td, tr:last-child th {
   border-bottom: none;
 }
 
@@ -130,7 +130,7 @@ td:nth-child(3) {
   border-radius: 0.5em;
   border-width: 1px;
 }
-#my-cards {
+.my-cards {
   display: flex;
   flex-wrap: wrap;
 }
