@@ -33,39 +33,29 @@ h1 {
 }
 @keyframes move {
   0% {
-    text-shadow: 4px -4px 0 cyan,
-      3px -3px 0 cyan, 2px -2px 0 cyan,
-      1px -1px 0 cyan, -4px 4px 0 magenta,
-      -3px 3px 0 magenta, -2px 2px 0 magenta,
-      -1px 1px 0 magenta;
+    text-shadow: 4px -4px 0 cyan, 3px -3px 0 cyan, 2px -2px 0 cyan,
+      1px -1px 0 cyan, -4px 4px 0 magenta, -3px 3px 0 magenta,
+      -2px 2px 0 magenta, -1px 1px 0 magenta;
   }
   25% {
-    text-shadow: -4px -4px 0 magenta,
-      -3px -3px 0 magenta, -2px -2px 0 magenta,
-      -1px -1px 0 magenta, 4px 4px 0 cyan,
-      3px 3px 0 cyan, 2px 2px 0 cyan,
+    text-shadow: -4px -4px 0 magenta, -3px -3px 0 magenta, -2px -2px 0 magenta,
+      -1px -1px 0 magenta, 4px 4px 0 cyan, 3px 3px 0 cyan, 2px 2px 0 cyan,
       1px 1px 0 cyan;
   }
   50% {
-    text-shadow: -4px 4px 0 cyan,
-      -3px 3px 0 cyan, -2px 2px 0 cyan,
-      -1px 1px 0 cyan, 4px -4px 0 magenta,
-      3px -3px 0 magenta, 2px -2px 0 magenta,
-      1px -1px 0 magenta;
+    text-shadow: -4px 4px 0 cyan, -3px 3px 0 cyan, -2px 2px 0 cyan,
+      -1px 1px 0 cyan, 4px -4px 0 magenta, 3px -3px 0 magenta,
+      2px -2px 0 magenta, 1px -1px 0 magenta;
   }
   75% {
-    text-shadow: 4px 4px 0 magenta,
-      3px 3px 0 magenta, 2px 2px 0 magenta,
-      1px 1px 0 magenta, -4px -4px 0 cyan,
-      -3px -3px 0 cyan, -2px -2px 0 cyan,
+    text-shadow: 4px 4px 0 magenta, 3px 3px 0 magenta, 2px 2px 0 magenta,
+      1px 1px 0 magenta, -4px -4px 0 cyan, -3px -3px 0 cyan, -2px -2px 0 cyan,
       -1px -1px 0 cyan;
   }
   100% {
-    text-shadow: 4px -4px 0 cyan,
-      3px -3px 0 cyan, 2px -2px 0 cyan,
-      1px -1px 0 cyan, -4px 4px 0 magenta,
-      -3px 3px 0 magenta, -2px 2px 0 magenta,
-      -1px 1px 0 magenta;
+    text-shadow: 4px -4px 0 cyan, 3px -3px 0 cyan, 2px -2px 0 cyan,
+      1px -1px 0 cyan, -4px 4px 0 magenta, -3px 3px 0 magenta,
+      -2px 2px 0 magenta, -1px 1px 0 magenta;
   }
 }
 
@@ -87,7 +77,8 @@ th {
   border-top: none;
 }
 
-tr:last-child td, tr:last-child th {
+tr:last-child td,
+tr:last-child th {
   border-bottom: none;
 }
 

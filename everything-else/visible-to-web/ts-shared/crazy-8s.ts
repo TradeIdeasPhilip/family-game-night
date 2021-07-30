@@ -86,10 +86,10 @@ export class Card {
     return FACES.get(this.face)!.isSkip;
   }
   get isRed() {
-    return (this.suit == "♥") || (this.suit == "♦");
+    return this.suit == "♥" || this.suit == "♦";
   }
   get isBlack() {
-    return (this.suit == "♠") || (this.suit == "♣");
+    return this.suit == "♠" || this.suit == "♣";
   }
   get points() {
     return FACES.get(this.face)!.points;

@@ -129,7 +129,7 @@ async function streamingCrazyEights(
           });
         },
         cancel() {
-          if (webSocket && (!webSocket.isClosed)) {
+          if (webSocket && !webSocket.isClosed) {
             webSocket.close(WEB_SOCKET_CLOSE_NO_RETRY);
           }
         },
