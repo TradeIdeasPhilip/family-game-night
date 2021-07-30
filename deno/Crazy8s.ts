@@ -115,14 +115,19 @@ export class Game {
   private registerAction(action : () => void) : string {
     return "TODO";
   }
+  matchesTopCard(card : Card) {
+    const topCard = this.topCard;
+    return card.isWild || (topCard.suit == card.suit) || (topCard.face == card.face);
+  }
   notifyAllGeneralInfo(player? : Player | undefined) {
     const players : Iterable<Player> = player?[player]:this.players.values();
     const gameStatus : GameStatus = { topCard: this.topCard, playersInOrder : this.playersInOrder.map(id => this.players.get(id)!.export()) };
+    const drawRequired = this.drawRequired > 0;
     for (const player of players) {
       if (player.playerConnection) {
         const isThisPlayersTurn = player.id == this.playersInOrder[0];
-        const makeButton = (name : string, action : () => void) : SingleButton => {
-          if (isThisPlayersTurn) {
+        const makeButton = (name : string, action : () => void, disable : boolean = false) : SingleButton => {
+          if (isThisPlayersTurn && !disable) {
             return [name, this.registerAction(action)];
           } else {
             return [name];
@@ -131,19 +136,32 @@ export class Game {
         const cards : ButtonStatus[] = player.cards.map(card => {
           let buttons : SingleButton[];
           // TODO add actual actions.
-          // TODO add more special cases, e.g. reverse, skip, draw 2.
           if (card.isWild) {
-            buttons = NORMAL_SUITS.map(suit => makeButton(suit, ()=> {console.log(`${player.name} is playing ${card.toString()} as a ${suit}`)}));
+            buttons = NORMAL_SUITS.map(suit => makeButton(suit, ()=> {console.log(`${player.name} is playing ${card.toString()} as a ${suit}`)}, drawRequired));
+          } else if (card.isReverse && (this.players.size > 2)) {
+            const reverseTo = this.getPlayerBefore(player);
+            buttons = [makeButton(`Reverse to ${reverseTo.name}`, () => console.log(`${player.name} is playing ${card.toString()} to reverse to ${reverseTo.name}`), drawRequired || !this.matchesTopCard(card))];
+          } else if (card.isSkip) {
+            const skipOver = this.getPlayerAfter(player);
+            buttons = [makeButton(`Skip ${skipOver.name}`, () => console.log(`${player.name} is playing ${card.toString()} to skip over ${skipOver.name}`), drawRequired || !this.matchesTopCard(card))];
+          } else if (card.isDraw2) {
+            // TODO We say "Draw 2" for two different reasons.  We say it when you are telling the next person to draw 2, and
+            // when someone does it to you.  Make this button should say `make ${nextPlayer} draw ${drawCount}`.
+            if (isThisPlayersTurn) {
+              const drawCount = this.drawRequired+2;
+              const victim = this.getPlayerAfter(player);
+              buttons = [makeButton(`Draw ${drawCount}`, () => console.log(`${player.name} is playing ${card.toString()} to make ${victim.name} draw ${drawCount}`))];
+            } else {
+              buttons = [["Draw 2"]];
+            }
           } else {
-            buttons = [makeButton("Play", () => {console.log(`${player.name} is playing ${card.toString()}`)})];
+            buttons = [makeButton("Play", () => {console.log(`${player.name} is playing ${card.toString()}`)}, drawRequired || !this.matchesTopCard(card))];
           }
           return { card, buttons };
         });
-        const cardStatus : CardStatus = { cards };
-        if (isThisPlayersTurn) {
-          // TODO what about draw 2, draw 4, etc.
-          cardStatus.drawCode = this.registerAction(() => console.log(`${player.name} is drawing a card.`))
-        }
+        const drawMultiple = drawRequired && isThisPlayersTurn;
+        const drawButton = makeButton(drawMultiple?`Draw ${this.drawRequired}`:"Draw", () => console.log(`${player.name} is drawing ${drawMultiple?this.drawRequired:1}`));
+        const cardStatus : CardStatus = { cards, drawButton };
         gameStatus.cardStatus = cardStatus;
         player.playerConnection.send(gameStatus);
       } 

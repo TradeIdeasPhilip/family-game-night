@@ -130,6 +130,10 @@ td:nth-child(3) {
   border-radius: 0.5em;
   border-width: 1px;
 }
+.my-card button:focus {
+  box-shadow: 0 0 0 0.25em orange;
+  outline: none;
+}
 .my-cards {
   display: flex;
   flex-wrap: wrap;

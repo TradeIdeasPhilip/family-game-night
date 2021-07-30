@@ -41,7 +41,7 @@ goButton.addEventListener("click", async (ev) => {
     const a = document.createElement("a");
     a.innerText = name;
     a.href = nameToUrl[name];
-    a.target = "new";
+    a.target = "_blank";
     const li = document.createElement("li");
     li.appendChild(a);
     listOfLinks.appendChild(li);

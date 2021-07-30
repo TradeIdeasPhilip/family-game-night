@@ -119,7 +119,7 @@ export type ButtonStatus = {
 
 export type CardStatus = {
   cards: ButtonStatus[];
-  drawCode?: string;
+  drawButton: SingleButton;
 };
 
 export type GameStatus = {
