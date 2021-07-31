@@ -67,10 +67,6 @@ table {
   border-spacing: 0;
 }
 
-.thisUsersInfo td {
-  font-weight: bold;
-}
-
 td,
 th {
   padding: 0 0.25em;
@@ -99,6 +95,24 @@ td:last-child {
 td:nth-child(2),
 td:nth-child(3) {
   text-align: right;
+}
+
+.thisUsersInfo td:first-child::after {
+  content: " – You";
+  font-style: italic;
+  color: blue;
+}
+
+.thisUsersInfo:nth-child(2) td:first-child::after {
+  content: " – Your turn";
+  font-style: italic;
+  color: blue;
+}
+
+.thisUsersInfo:nth-child(3) td:first-child::after {
+  content: " – You're next";
+  font-style: italic;
+  color: blue;
 }
 
 @keyframes wild-card {
