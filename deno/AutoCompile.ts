@@ -1,5 +1,40 @@
 import { AugmentedRequest, WebServer } from "./Dispatcher.ts";
 
+// TODO
+// How do we prevent a programmer from editing the wrong version of the file?
+//
+// If you edit the wrong version, it will look right at first, but the next time
+// you run the server your changes will be silently overwritten.  This can cause
+// much confusion.
+//
+// My first attempt was to tell the o/s that the file was read only, but I could
+// not make that work.
+//
+// Currently I add comments to the top of the file, warning people not to edit
+// this file direction.  Those are easy to miss.  The current setup does not
+// solve the problem.
+//
+// Proposal:
+// Automatically change the file names.  This is an obvious way to send a message
+// to the user.  You might see "crazy-8s.ts" on the "everything-else" side of the 
+// project, like you do now.  In that case you would edit the file like normal.
+//
+// But on the "deno" side the name automatically changes to something like:
+//  o 🕃crazy-8s🕄.ts
+//  o ⛔ crazy-8s.ts
+//  o s8-ʎzɐɹɔ.ts
+//  o 𝒸𝓇𝒶𝓏𝓎-8𝓈.ts or
+//  o 𝕔𝕣𝕒𝕫𝕪-𝟠𝕤.ts
+// (See http://xahlee.info/comp/unicode_math_font.html for more options.)
+// We still are warning the user, not completely preventing him from changing something,
+// but this should help a lot.
+//
+// Every reference to a file on the everything-else side will use the simple name.
+// Every reference on the deno side will use the decorated name.  Note:  Some
+// references on the deno side will be hand written, and others will be created by
+// the copy process.  At the same time as we adjust the file extension, we can add
+// the ⛔ sign.
+
 function bashQuote(args: string[]): string {
   let result = "";
   args.forEach((arg) => {
