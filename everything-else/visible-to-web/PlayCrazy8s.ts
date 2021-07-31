@@ -69,7 +69,6 @@ connection.onmessage = (event) => {
       Array.from(myCardsDiv.querySelectorAll(".my-card:not(#drawDiv)")).forEach(
         (element) => element.remove()
       );
-      // TODO seems like the title of this button can change, too.  Sometimes "Draw 2" or "Draw 4".
       drawButton.innerText = gameStatus.cardStatus.drawButton[0];
       drawButton.disabled = gameStatus.cardStatus.drawButton[1] === undefined;
       gameStatus.cardStatus.cards.forEach((buttonStatus) => {

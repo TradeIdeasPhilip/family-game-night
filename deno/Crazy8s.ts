@@ -48,23 +48,7 @@ class Player implements SimplePlayerInterface {
 
 export class Game {
   private drawRequired = 0;
-  private discardPile: Card[] = [];
-  private stock: Card[];
-  private checkStock() {
-    if (this.stock.length == 0) {
-      const visibleDiscard = this.discardPile.pop();
-      if (!visibleDiscard) {
-        // There should always be at least one discard, the top one that the next player is trying to match.
-        throw new Error("wtf");
-      }
-      // Move everything from but the top card from the discardPile to the stock.
-      [this.stock, this.discardPile] = [this.discardPile, this.stock];
-      // The discard pile will only contain that one visible card.
-      this.discardPile.push(visibleDiscard);
-      shuffleArray(this.stock);
-      // TODO should we notify people of the shuffle?
-    }
-  }
+  private topCard = Card.randomNoWild();
   private readonly players: ReadonlyMap<number, Player>;
 
   /**
@@ -84,40 +68,13 @@ export class Game {
   constructor(playerNames: string[]) {
     const players = new Map<number, Player>();
     this.players = players;
-    this.stock = Card.createDeck();
-    // TODO if there are "a lot of players" we should use 2 decks.  Presumably we could
-    // use even more based on the number of players.
-    shuffleArray(this.stock);
-
-    // Turn over one card.  If it's wild, bury it and try again until you find a card that is not wild.
-    //
-    // The original rules said to deal to the players first.  This seems easier, mostly to avoid running
-    // of non-wild cards before getting here!  This change in order leads to a very slight difference in
-    // the chance of a player getting a wild card in his initial hand, but very little difference.  And
-    // the effect is the same for all players, so it's fair.
-    while (true) {
-      const drawn = this.stock.pop();
-      if (!drawn) {
-        throw new Error("wtf");
-      }
-      if (!drawn.isWild) {
-        this.discardPile.push(drawn);
-        break;
-      }
-      this.stock.splice((Math.random() * this.stock.length) | 0, 0, drawn);
-    }
 
     const cardsPerPlayer = playerNames.length == 2 ? 7 : 5;
-    if (cardsPerPlayer * playerNames.length + 1 > this.stock.length) {
-      throw new Error("Not enough cards!");
-    }
+    const dealTemplate = Array.from(new Array(cardsPerPlayer));
     playerNames.forEach((name) => {
       const id = Game.nextPlayerId;
       Game.nextPlayerId++;
-      const deal = this.stock.splice(
-        this.stock.length - cardsPerPlayer,
-        cardsPerPlayer
-      );
+      const deal = dealTemplate.map(() => Card.randomAny());
       if (deal.length != cardsPerPlayer) {
         throw new Error("wtf");
       }
@@ -125,9 +82,6 @@ export class Game {
       players.set(id, new Player(name, id, deal));
       this.playersInOrder.push(id);
     });
-  }
-  get topCard(): Card {
-    return this.discardPile[this.discardPile.length - 1];
   }
   /**
    * This will store the action for later use by the client.

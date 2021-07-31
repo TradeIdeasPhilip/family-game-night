@@ -1,3 +1,5 @@
+import { pickOneRandomly } from "./useful-stuff.js";
+
 export type Face =
   | "A"
   | "2"
@@ -22,57 +24,78 @@ export type FaceInfo = {
   isDraw2?: boolean;
   isSkip?: boolean;
   points: number;
+  sortOrder: number;
 };
 
 const FACES: ReadonlyMap<Face, FaceInfo> = new Map([
-  ["A", { points: 1, isReverse: true }],
-  ["2", { points: 2, isDraw2: true }],
-  ["3", { points: 3 }],
-  ["4", { points: 4 }],
-  ["5", { points: 5 }],
-  ["6", { points: 6 }],
-  ["7", { points: 7 }],
-  ["8", { points: 50, isWild: true }],
-  ["9", { points: 9 }],
-  ["10", { points: 10 }],
-  ["J", { points: 10 }],
-  ["Q", { points: 10, isSkip: true }],
-  ["K", { points: 10 }],
+  ["A", { sortOrder: 1, points: 1, isReverse: true }],
+  ["2", { sortOrder: 2, points: 2, isDraw2: true }],
+  ["3", { sortOrder: 3, points: 3 }],
+  ["4", { sortOrder: 4, points: 4 }],
+  ["5", { sortOrder: 5, points: 5 }],
+  ["6", { sortOrder: 6, points: 6 }],
+  ["7", { sortOrder: 7, points: 7 }],
+  ["8", { sortOrder: 8, points: 50, isWild: true }],
+  ["9", { sortOrder: 9, points: 9 }],
+  ["10", { sortOrder: 10, points: 10 }],
+  ["J", { sortOrder: 11, points: 10 }],
+  ["Q", { sortOrder: 12, points: 10, isSkip: true }],
+  ["K", { sortOrder: 13, points: 10 }],
 ]);
 
-export const NORMAL_SUITS = ["♠", "♥", "♦", "♣"] as const;
+const FACES_IN_ORDER: ReadonlyArray<Face> = Array.from(FACES.keys());
+
+const FACES_NO_WILD: ReadonlyArray<Face> = FACES_IN_ORDER.filter(
+  (face) => !FACES.get(face)!.isWild
+);
+
+export const NORMAL_SUITS: Suit[] = ["♠", "♥", "♦", "♣"];
+
+const SUITS: Suit[] = ["●", ...NORMAL_SUITS];
+
+const sortOrderBySuit: ReadonlyMap<Suit, number> = new Map(
+  SUITS.map((suit, index) => [suit, (index + 1) * 100])
+);
 
 export class Card {
   toString() {
     return this.face + this.suit;
   }
-  private constructor(
-    readonly face: Face,
-    readonly suit: Suit,
-    readonly sortOrder: number
-  ) {
-    //
+  readonly sortOrder: number;
+  private constructor(readonly face: Face, readonly suit: Suit) {
+    this.sortOrder = FACES.get(face)!.sortOrder + sortOrderBySuit.get(suit)!;
   }
   static fromJson(json: JsonCard): Card {
-    return new Card(json.face, json.suit, json.sortOrder);
+    return new Card(json.face, json.suit);
   }
-  static createDeck(count = 1): Card[] {
-    let result: Card[] = [];
-    let sortOrder = 1;
-    for (let i = 0; i < 4 * count; i++) {
-      result.push(new Card("8", "●", sortOrder++));
+
+  /**
+   *
+   * @returns A randomly selected card that is not wild.
+   */
+  static randomNoWild() {
+    return new Card(
+      pickOneRandomly(FACES_NO_WILD),
+      pickOneRandomly(NORMAL_SUITS)
+    );
+  }
+
+  /**
+   *
+   * @returns A randomly selected card.  8's are wild.
+   */
+  static randomAny() {
+    // We always pick a random card to make things easier.  We don't have to keep track of the cards
+    // in play.  And we don't have to test a lot of edge cases, like running out of cards in a draw 6
+    // situation.
+    const face = pickOneRandomly(FACES_IN_ORDER);
+    if (FACES.get(face)!.isWild) {
+      return new Card(face, "●");
+    } else {
+      return new Card(face, pickOneRandomly(NORMAL_SUITS));
     }
-    NORMAL_SUITS.forEach((suit) => {
-      FACES.forEach((faceInfo, face) => {
-        if (!faceInfo.isWild) {
-          for (let i = 0; i < count; i++) {
-            result.push(new Card(face, suit, sortOrder++));
-          }
-        }
-      });
-    });
-    return result;
   }
+
   get isWild() {
     return FACES.get(this.face)!.isWild;
   }
@@ -99,7 +122,6 @@ export class Card {
 export type JsonCard = {
   face: Face;
   suit: Suit;
-  sortOrder: number;
 };
 
 export type JsonPlayer = {

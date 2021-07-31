@@ -37,6 +37,15 @@ export function makeWebSocketUrl(
     .replace(/^http/, "ws");
 }
 
+export function pickOneRandomly<T>(array : ReadonlyArray<T>) : T {
+  const length = array.length;
+  if (length == 0) {
+    throw new Error("Array is empty.");
+  }
+  const index = (Math.random()*length) |0;
+  return array[index];
+}
+
 let libraryContext = "Deno server 🦕";
 // The following line will be commented out when we copy to the Deno server.
 libraryContext = "Web client 🕸"; // 𝒩ℴ𝓉 𝒻ℴ𝓇 𝒟ℯ𝓃ℴ
