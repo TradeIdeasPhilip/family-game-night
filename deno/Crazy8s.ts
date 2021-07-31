@@ -168,23 +168,17 @@ export class Game {
               ),
             ];
           } else if (card.isDraw2) {
-            // TODO We say "Draw 2" for two different reasons.  We say it when you are telling the next person to draw 2, and
-            // when someone does it to you.  Make this button should say `make ${nextPlayer} draw ${drawCount}`.
-            if (isThisPlayersTurn) {
-              const drawCount = this.drawRequired + 2;
-              const victim = this.getPlayerAfter(player);
-              buttons = [
-                makeButton(`Draw ${drawCount}`, () =>
-                  console.log(
-                    `${player.name} is playing ${card.toString()} to make ${
-                      victim.name
-                    } draw ${drawCount}`
-                  )
-                ),
-              ];
-            } else {
-              buttons = [["Draw 2"]];
-            }
+            const drawCount = this.drawRequired + 2;
+            const victim = this.getPlayerAfter(player);
+            buttons = [
+              makeButton(`Make ${victim.name} draw ${drawCount}`, () =>
+                console.log(
+                  `${player.name} is playing ${card.toString()} to make ${
+                    victim.name
+                  } draw ${drawCount}`
+                )
+              ),
+            ];
           } else {
             buttons = [
               makeButton(
