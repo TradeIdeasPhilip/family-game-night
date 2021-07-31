@@ -67,6 +67,10 @@ table {
   border-spacing: 0;
 }
 
+.thisUsersInfo td {
+  font-weight: bold;
+}
+
 td,
 th {
   padding: 0 0.25em;

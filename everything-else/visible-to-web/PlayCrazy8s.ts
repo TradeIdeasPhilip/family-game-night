@@ -50,6 +50,10 @@ connection.onmessage = (event) => {
       ).forEach((element) => element.remove());
       gameStatus.playersInOrder.forEach((player) => {
         const tr = userListTable.insertRow();
+        if (userId && (player.id == +userId)) {
+          // The user running this script is the player in this row.
+          tr.className = "thisUsersInfo";
+        }
         const nameTd = tr.insertCell();
         nameTd.innerText = player.name;
         const cardsTd = tr.insertCell();
