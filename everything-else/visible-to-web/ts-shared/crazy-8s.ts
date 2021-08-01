@@ -97,7 +97,7 @@ export class Card {
   }
 
   as(newSuit : Suit) {
-    if (this.suit != "●") {
+    if (!this.isWild) {
       throw new Error("card must be wild");
     } else {
       return new Card(this.face, newSuit);
@@ -105,20 +105,27 @@ export class Card {
   }
 
   get isWild() {
-    return FACES.get(this.face)!.isWild;
+    // Note: an 8 is initially wild when it is first dealt and in a player's hand.
+    // When the player plays the 8 he must pick a suit and it is no longer wild.
+    return this.suit == "●";
   }
+
   get isReverse() {
     return FACES.get(this.face)!.isReverse;
   }
+
   get isDraw2() {
     return FACES.get(this.face)!.isDraw2;
   }
+
   get isSkip() {
     return FACES.get(this.face)!.isSkip;
   }
+
   get isRed() {
     return this.suit == "♥" || this.suit == "♦";
   }
+
   get isBlack() {
     return this.suit == "♠" || this.suit == "♣";
   }

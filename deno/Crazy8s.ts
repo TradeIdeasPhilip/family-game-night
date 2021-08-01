@@ -34,7 +34,12 @@ class Player implements SimplePlayerInterface {
     public readonly name: string,
     public readonly id: number,
     public readonly cards: Card[]
-  ) {}
+  ) {
+    this.sortCards();
+  }
+  sortCards() : void {
+    this.cards.sort((a, b) => a.sortOrder - b.sortOrder);
+  }
   export(): JsonPlayer {
     return {
       cards: this.cards.length,
@@ -78,7 +83,6 @@ export class Game {
       if (deal.length != cardsPerPlayer) {
         throw new Error("wtf");
       }
-      deal.sort((a, b) => a.sortOrder - b.sortOrder);
       players.set(id, new Player(name, id, deal));
       this.playersInOrder.push(id);
     });
@@ -111,7 +115,7 @@ export class Game {
   /**
    * Clear any cached values and send the new game state to all users.
    */
-  private updateAllUsers() : void {
+  private updateAllUsers(): void {
     // Clear cached values -- We aren't caching anything yet.  But we need to cache the button callbacks.
     //                        We should not be recreating these every time we send an update.  TODO
     // Check for winner?  Maybe somewhere else.  TODO
@@ -149,7 +153,7 @@ export class Game {
            * to match this card.
            */
           const playCard = () => {
-            const index = player.cards.findIndex(c => c == card);
+            const index = player.cards.findIndex((c) => c == card);
             if (index < 0) {
               // Assertion failed, shouldn't happen.
               console.error("card not found", card, player);
@@ -157,7 +161,7 @@ export class Game {
             }
             player.cards.splice(index, 1);
             this.topCard = card;
-          }
+          };
           let buttons: SingleButton[];
           if (card.isWild) {
             buttons = NORMAL_SUITS.map((suit) =>
@@ -180,8 +184,7 @@ export class Game {
             buttons = [
               makeButton(
                 `Reverse to ${reverseTo.name}`,
-                () =>
-                {
+                () => {
                   console.log(
                     `${
                       player.name
@@ -204,8 +207,7 @@ export class Game {
             buttons = [
               makeButton(
                 `Skip ${skipOver.name}`,
-                () =>
-                {
+                () => {
                   console.log(
                     `${
                       player.name
@@ -226,8 +228,7 @@ export class Game {
             buttons = [
               makeButton(
                 `Make ${victim.name} draw ${drawCount}`,
-                () =>
-                {
+                () => {
                   console.log(
                     `${player.name} is playing ${card.toString()} to make ${
                       victim.name
@@ -260,12 +261,24 @@ export class Game {
         const drawMultiple = drawRequired && isThisPlayersTurn;
         const drawButton = makeButton(
           drawMultiple ? `Draw ${this.drawRequired}` : "Draw",
-          () =>
+          () => {
             console.log(
               `${player.name} is drawing ${
                 drawMultiple ? this.drawRequired : 1
               }`
-            )
+            );
+            if (drawRequired) {
+              for (let i = 0; i < this.drawRequired; i++) {
+                player.cards.push(Card.randomAny());
+              }
+              this.drawRequired = 0;
+            } else {
+              player.cards.push(Card.randomAny());
+            }
+            player.sortCards();
+            this.advancePlayers();
+            this.updateAllUsers();
+          }
         );
         const cardStatus: CardStatus = { cards, drawButton };
         gameStatus.cardStatus = cardStatus;
@@ -302,9 +315,9 @@ export class Game {
   reversePlayers() {
     this.playersInOrder.reverse();
   }
-  
+
   /**
-   * 
+   *
    * @param by The number of steps to rotate by.  1 is the default and means to
    * advance normally to the next player.  2 means to skip the next player.  The
    * min is 0 and the max is the number of players.  Either of those extremes

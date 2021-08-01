@@ -35,6 +35,23 @@ connection.onclose = (event) => {
 connection.onerror = (event) => {
   console.log("WebSocket.onerror", event);
 };
+
+function sendButtonResponse(code : string) {
+  const message : ButtonPressEvent = { code, type: "ButtonPressEvent" };
+  connection.send(JSON.stringify(message));
+  myCardsDiv.querySelectorAll("button").forEach(button => button.disabled = true);
+}
+
+let drawButtonAction : string | undefined;
+
+drawButton.addEventListener("click", () => {
+  if (drawButtonAction === undefined) {
+    console.log("That's not right!  if drawButtonAction is undefined, drawButton should be disabled.");
+  } else {
+    sendButtonResponse(drawButtonAction);
+  }
+});
+
 connection.onmessage = (event) => {
   try {
     const gameStatus: GameStatus = JSON.parse(event.data);
@@ -70,8 +87,8 @@ connection.onmessage = (event) => {
         (element) => element.remove()
       );
       drawButton.innerText = gameStatus.cardStatus.drawButton[0];
-      // TODO save the code and act on it when someone clicks.
-      drawButton.disabled = gameStatus.cardStatus.drawButton[1] === undefined;
+      drawButtonAction = gameStatus.cardStatus.drawButton[1];
+      drawButton.disabled = drawButtonAction === undefined;
       gameStatus.cardStatus.cards.forEach((buttonStatus) => {
         const topLevel = document.createElement("div");
         topLevel.className = "my-card";
@@ -99,10 +116,8 @@ connection.onmessage = (event) => {
           if (code === undefined) {
             button.disabled = true;
           } else {
-            const message : ButtonPressEvent = { code, type: "ButtonPressEvent" };
             button.addEventListener("click", () => {
-              connection.send(JSON.stringify(message));
-              myCardsDiv.querySelectorAll("button").forEach(button => button.disabled = true);
+              sendButtonResponse(code);
             });            
           }
           if (buttonText == "♥" || buttonText == "♦") {
