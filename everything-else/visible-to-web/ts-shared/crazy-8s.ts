@@ -96,6 +96,14 @@ export class Card {
     }
   }
 
+  as(newSuit : Suit) {
+    if (this.suit != "●") {
+      throw new Error("card must be wild");
+    } else {
+      return new Card(this.face, newSuit);
+    }
+  }
+
   get isWild() {
     return FACES.get(this.face)!.isWild;
   }

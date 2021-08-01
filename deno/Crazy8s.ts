@@ -108,6 +108,17 @@ export class Game {
       card.isWild || topCard.suit == card.suit || topCard.face == card.face
     );
   }
+  /**
+   * Clear any cached values and send the new game state to all users.
+   */
+  private updateAllUsers() : void {
+    // Clear cached values -- We aren't caching anything yet.  But we need to cache the button callbacks.
+    //                        We should not be recreating these every time we send an update.  TODO
+    // Check for winner?  Maybe somewhere else.  TODO
+
+    // Notify all listeners.  Assume something has changed for all players.
+    this.notifyAllGeneralInfo();
+  }
   notifyAllGeneralInfo(player?: Player | undefined) {
     const players: Iterable<Player> = player ? [player] : this.players.values();
     const gameStatus: GameStatus = {
@@ -132,8 +143,22 @@ export class Game {
           }
         };
         const cards: ButtonStatus[] = player.cards.map((card) => {
+          /**
+           * Remove the current card from the player's hand and put it face up
+           * on the top of the stack of discards.  The next player will try
+           * to match this card.
+           */
+          const playCard = () => {
+            const index = player.cards.findIndex(c => c == card);
+            if (index < 0) {
+              // Assertion failed, shouldn't happen.
+              console.error("card not found", card, player);
+              throw new Error("card not found");
+            }
+            player.cards.splice(index, 1);
+            this.topCard = card;
+          }
           let buttons: SingleButton[];
-          // TODO add actual actions.
           if (card.isWild) {
             buttons = NORMAL_SUITS.map((suit) =>
               makeButton(
@@ -142,6 +167,10 @@ export class Game {
                   console.log(
                     `${player.name} is playing ${card.toString()} as a ${suit}`
                   );
+                  playCard();
+                  this.topCard = card.as(suit);
+                  this.advancePlayers();
+                  this.updateAllUsers();
                 },
                 drawRequired
               )
@@ -152,13 +181,21 @@ export class Game {
               makeButton(
                 `Reverse to ${reverseTo.name}`,
                 () =>
+                {
                   console.log(
                     `${
                       player.name
                     } is playing ${card.toString()} to reverse to ${
                       reverseTo.name
                     }`
-                  ),
+                  );
+                  playCard();
+                  this.playersInOrder.reverse();
+                  // The current player is now at the end of the list.  The player who was
+                  // at the end of the list, the player who played right before the current
+                  // player, is now at the front of the list.
+                  this.updateAllUsers();
+                },
                 drawRequired || !this.matchesTopCard(card)
               ),
             ];
@@ -168,13 +205,18 @@ export class Game {
               makeButton(
                 `Skip ${skipOver.name}`,
                 () =>
+                {
                   console.log(
                     `${
                       player.name
                     } is playing ${card.toString()} to skip over ${
                       skipOver.name
                     }`
-                  ),
+                  );
+                  playCard();
+                  this.advancePlayers(2);
+                  this.updateAllUsers();
+                },
                 drawRequired || !this.matchesTopCard(card)
               ),
             ];
@@ -185,11 +227,17 @@ export class Game {
               makeButton(
                 `Make ${victim.name} draw ${drawCount}`,
                 () =>
+                {
                   console.log(
                     `${player.name} is playing ${card.toString()} to make ${
                       victim.name
                     } draw ${drawCount}`
-                  ),
+                  );
+                  playCard();
+                  this.drawRequired = drawCount;
+                  this.advancePlayers();
+                  this.updateAllUsers();
+                },
                 !this.matchesTopCard(card)
               ),
             ];
@@ -199,6 +247,9 @@ export class Game {
                 "Play",
                 () => {
                   console.log(`${player.name} is playing ${card.toString()}`);
+                  playCard();
+                  this.advancePlayers();
+                  this.updateAllUsers();
                 },
                 drawRequired || !this.matchesTopCard(card)
               ),
@@ -251,9 +302,18 @@ export class Game {
   reversePlayers() {
     this.playersInOrder.reverse();
   }
+  
+  /**
+   * 
+   * @param by The number of steps to rotate by.  1 is the default and means to
+   * advance normally to the next player.  2 means to skip the next player.  The
+   * min is 0 and the max is the number of players.  Either of those extremes
+   * will cause this function to do nothing.
+   */
   advancePlayers(by = 1) {
     this.playersInOrder.push(...this.playersInOrder.splice(0, by));
   }
+
   setPlayerConnection(
     playerId: number,
     playerConnection: PlayerConnection | undefined
