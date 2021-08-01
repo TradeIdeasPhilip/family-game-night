@@ -13,6 +13,7 @@ import {
   WEB_SOCKET_CLOSE_INTERNAL_ERROR,
   WEB_SOCKET_CLOSE_UNSUPPORTED_DATA,
   WEB_SOCKET_CLOSE_NO_RETRY,
+  isButtonPressEvent,
 } from "./shared/crazy-8s.ts";
 
 const webServer: WebServer = new WebServer();
@@ -137,8 +138,17 @@ async function streamingCrazyEights(
       game?.sendUpdatedStatus(id);
     }
     for await (const ev of webSocket) {
-      // TODO if we get an event, pass it on to the corresponding game
       console.log("webSocket event", ev);
+      try {
+        if (typeof ev === "string") {
+          const object = JSON.parse(ev);
+          if (isButtonPressEvent(object)) {
+            game?.runAction(object.code);
+          }
+        }
+      } catch (ex) {
+        console.error("trying to handle webSocket event.", ex);
+      }
     }
   } catch (err) {
     if (!webSocket) {

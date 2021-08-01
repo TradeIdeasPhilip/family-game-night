@@ -83,13 +83,24 @@ export class Game {
       this.playersInOrder.push(id);
     });
   }
+  private static lastActionId = 0;
+  private readonly actions = new Map<string, () => void>();
   /**
    * This will store the action for later use by the client.
    * @param action A callback to be performed if and when the client requests it.
    * @returns A string that we can give to the client.  The client will use this to request the corresponding action.
    */
   private registerAction(action: () => void): string {
-    return "TODO";
+    const code = ++Game.lastActionId + ":" + Math.random();
+    this.actions.set(code, action);
+    return code;
+  }
+  public runAction(code: string) {
+    try {
+      this.actions.get(code)?.();
+    } catch (ex) {
+      console.error("Game.runAction()", code, ex);
+    }
   }
   matchesTopCard(card: Card) {
     const topCard = this.topCard;
@@ -171,12 +182,15 @@ export class Game {
             const drawCount = this.drawRequired + 2;
             const victim = this.getPlayerAfter(player);
             buttons = [
-              makeButton(`Make ${victim.name} draw ${drawCount}`, () =>
-                console.log(
-                  `${player.name} is playing ${card.toString()} to make ${
-                    victim.name
-                  } draw ${drawCount}`
-                )
+              makeButton(
+                `Make ${victim.name} draw ${drawCount}`,
+                () =>
+                  console.log(
+                    `${player.name} is playing ${card.toString()} to make ${
+                      victim.name
+                    } draw ${drawCount}`
+                  ),
+                !this.matchesTopCard(card)
               ),
             ];
           } else {

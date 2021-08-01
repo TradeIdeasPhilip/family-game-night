@@ -169,3 +169,19 @@ export const WEB_SOCKET_CLOSE_INTERNAL_ERROR = 1011;
  * More info:  https://developer.mozilla.org/en-US/docs/Web/API/CloseEvent#properties
  */
 export const WEB_SOCKET_CLOSE_NO_RETRY = 4000;
+
+/**
+ * Goes from the client back to the server.
+ */
+export type ButtonPressEvent = {
+  type : "ButtonPressEvent",
+  /**
+   * This is a cookie which was sent by the server to the client.
+   * Each button gets its own code.
+   */
+  code : string;
+}
+
+export function isButtonPressEvent(e : any) : e is ButtonPressEvent {
+  return ((typeof e == "object") && (e.type == "ButtonPressEvent") && (typeof e.code == "string"));
+}

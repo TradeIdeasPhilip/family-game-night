@@ -1,4 +1,4 @@
-import { Card, GameStatus } from "./ts-shared/crazy-8s.js";
+import { ButtonPressEvent, Card, GameStatus } from "./ts-shared/crazy-8s.js";
 import { makeWebSocketUrl } from "./ts-shared/useful-stuff.js";
 import { getById } from "./ts/client-misc.js";
 
@@ -70,6 +70,7 @@ connection.onmessage = (event) => {
         (element) => element.remove()
       );
       drawButton.innerText = gameStatus.cardStatus.drawButton[0];
+      // TODO save the code and act on it when someone clicks.
       drawButton.disabled = gameStatus.cardStatus.drawButton[1] === undefined;
       gameStatus.cardStatus.cards.forEach((buttonStatus) => {
         const topLevel = document.createElement("div");
@@ -94,7 +95,16 @@ connection.onmessage = (event) => {
           const button = document.createElement("button");
           const buttonText = buttonInfo[0];
           button.innerText = buttonText;
-          button.disabled = buttonInfo[1] == undefined;
+          const code = buttonInfo[1];
+          if (code === undefined) {
+            button.disabled = true;
+          } else {
+            const message : ButtonPressEvent = { code, type: "ButtonPressEvent" };
+            button.addEventListener("click", () => {
+              connection.send(JSON.stringify(message));
+              myCardsDiv.querySelectorAll("button").forEach(button => button.disabled = true);
+            });            
+          }
           if (buttonText == "♥" || buttonText == "♦") {
             button.className = "red-card";
           }
