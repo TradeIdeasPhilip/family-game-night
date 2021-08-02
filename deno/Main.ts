@@ -1,20 +1,20 @@
 import { addTsCompiler } from "./AutoCompile.ts";
 import { AugmentedRequest, WebServer } from "./Dispatcher.ts";
-import { sleep } from "./shared/useful-stuff.ts";
+import { sleep } from "./shared/⛔useful-stuff.ts";
 import {
   acceptWebSocket,
   isWebSocketCloseEvent,
   isWebSocketPingEvent,
   WebSocket,
   WebSocketEvent,
-} from "https://deno.land/std/ws/mod.ts";
+} from "https://deno.land/std@0.103.0/ws/mod.ts";
 import { Game } from "./Crazy8s.ts";
 import {
   WEB_SOCKET_CLOSE_INTERNAL_ERROR,
   WEB_SOCKET_CLOSE_UNSUPPORTED_DATA,
   WEB_SOCKET_CLOSE_NO_RETRY,
   isButtonPressEvent,
-} from "./shared/crazy-8s.ts";
+} from "./shared/⛔crazy-8s.ts";
 
 const webServer: WebServer = new WebServer();
 

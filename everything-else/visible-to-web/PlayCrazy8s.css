@@ -63,6 +63,7 @@ h1 {
   animation: winner linear 2000ms infinite;
 }
 
+/* TODO arrange these in a star shape.  Currently 2 are overlapping. */
 @keyframes winner {
   0%, 100% {
     text-shadow: 0 0 0 red, 0 0 0 #00FF0000, 0.375em -0.375em 0.375em #0000FF00, -0.25em 0.25em 0.25em #FFFF00, 0.125em 0.125em 0.0625em #A080FF;

@@ -4,7 +4,7 @@
 // And you can also point it to static files.
 // REMEMBER: If you use modules in your client code you can't test directly from the file system, you must use a web server.
 
-import { serve, ServerRequest } from "https://deno.land/std/http/server.ts";
+import { serve, ServerRequest } from "https://deno.land/std@0.103.0/http/server.ts";
 
 export type AugmentedRequest = ServerRequest & {
   path: string;

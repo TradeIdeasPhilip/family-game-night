@@ -6,7 +6,7 @@ import {
   JsonPlayer,
   NORMAL_SUITS,
   SingleButton,
-} from "./shared/crazy-8s.ts";
+} from "./shared/⛔crazy-8s.ts";
 
 // Adapted from https://stackoverflow.com/a/12646864/971955
 function shuffleArray<T>(array: T[]) {
