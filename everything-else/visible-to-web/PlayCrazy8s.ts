@@ -36,17 +36,21 @@ connection.onerror = (event) => {
   console.log("WebSocket.onerror", event);
 };
 
-function sendButtonResponse(code : string) {
-  const message : ButtonPressEvent = { code, type: "ButtonPressEvent" };
+function sendButtonResponse(code: string) {
+  const message: ButtonPressEvent = { code, type: "ButtonPressEvent" };
   connection.send(JSON.stringify(message));
-  myCardsDiv.querySelectorAll("button").forEach(button => button.disabled = true);
+  myCardsDiv
+    .querySelectorAll("button")
+    .forEach((button) => (button.disabled = true));
 }
 
-let drawButtonAction : string | undefined;
+let drawButtonAction: string | undefined;
 
 drawButton.addEventListener("click", () => {
   if (drawButtonAction === undefined) {
-    console.log("That's not right!  if drawButtonAction is undefined, drawButton should be disabled.");
+    console.log(
+      "That's not right!  if drawButtonAction is undefined, drawButton should be disabled."
+    );
   } else {
     sendButtonResponse(drawButtonAction);
   }
@@ -67,14 +71,31 @@ connection.onmessage = (event) => {
       ).forEach((element) => element.remove());
       gameStatus.playersInOrder.forEach((player) => {
         const tr = userListTable.insertRow();
-        if (userId && (player.id == +userId)) {
+        if (userId && player.id == +userId) {
           // The user running this script is the player in this row.
           tr.className = "thisUsersInfo";
         }
         const nameTd = tr.insertCell();
         nameTd.innerText = player.name;
         const cardsTd = tr.insertCell();
-        cardsTd.innerText = player.cards.toString();
+        switch (player.cards) {
+          case 0: {
+            cardsTd.innerText = "Winner!";
+            cardsTd.className = "winner";
+            break;
+          }
+          case 1: {
+            const span = document.createElement("span");
+            span.innerText = "Uno";
+            span.className = "one-card-left";
+            cardsTd.appendChild(span);
+            break;
+          }
+          default: {
+            cardsTd.innerText = player.cards.toString();
+            break;
+          }
+        }
         const scoreTd = tr.insertCell();
         scoreTd.innerText = player.score.toString();
         const lastSeenTd = tr.insertCell();
@@ -118,7 +139,7 @@ connection.onmessage = (event) => {
           } else {
             button.addEventListener("click", () => {
               sendButtonResponse(code);
-            });            
+            });
           }
           if (buttonText == "♥" || buttonText == "♦") {
             button.className = "red-card";

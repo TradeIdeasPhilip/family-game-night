@@ -59,6 +59,29 @@ h1 {
   }
 }
 
+.winner {
+  animation: winner linear 2000ms infinite;
+}
+
+@keyframes winner {
+  0%, 100% {
+    text-shadow: 0 0 0 red, 0 0 0 #00FF0000, 0.375em -0.375em 0.375em #0000FF00, -0.25em 0.25em 0.25em #FFFF00, 0.125em 0.125em 0.0625em #A080FF;
+  }
+  20% {
+    text-shadow: 0.125em 0.125em 0.0625em red, 0 0 0 green, 0 0 0 #0000FF00,-0.375em 0.375em 0.375em #FFFF0000, 0.25em 0.25em 0.25em #A080FF;
+  }
+  40% {
+    text-shadow: 0.25em 0.25em 0.25em red, -0.125em -0.125em 0.0625em green, 0 0 0 blue, 0 0 0 #FFFF0000, 0.375em 0.375em 0.375em #A080FF00;
+  }
+  60% {
+    text-shadow: 0.375em 0.375em 0.375em #FF000000, -0.25em -0.25em 0.25em green, 0.125em -0.125em 0.0625em blue, 0 0 0 #FFFF00, 0 0 0 #A080FF00;
+  }
+  80% {
+    text-shadow: 0 0 0 #FF000000, -0.375em -0.375em 0.375em #00FF0000, 0.25em -0.25em 0.25em blue, -0.125em 0.125em 0.0625em #FFFF00, 0 0 0 #A080FF;
+  }
+}
+
+
 table {
   border: 0.2em solid;
   border-radius: 0.5em;
