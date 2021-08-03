@@ -19,8 +19,19 @@ If you try to read a `*.js` file that is older than the corresponding `*.ts` fil
 ~~I reconfigured the client project to automatically run typescript, so as long as you make changes from VS code (and you do the one time setup described in everything-else/.vscode/tasks.json) things should still work.~~
 
 ## Status
-Automatic compiles are completely broken.
+Automatic compiles of _client_ code are completely broken.
 My custom library that rebuilds `*.ts` to `*.js` as needed in the web server is broken and I don't know why.
 Then I tried running tsc in watch mode, but, as [this article](https://github.com/microsoft/vscode/issues/31294) explains, Microsoft broke that feature.
 I also tried what the article suggested, but that didn't work either.
 Any time you change the source code, remember to hit control-shift-b to rebuild the project.
+
+(Automatic compiles of _server_ code have not changed.
+Every time you run it copies all the right files over.
+But you might want to do the copy more often, so you can see changes in the editor immediately.)
+
+The basic game is now in place and working.
+It's missing a lot of stuff, like keeping score.
+But the basic game is there and playable.
+
+I feel better about some parts of this endeavor.
+If don't worry about sharing libraries with other projects, then it's fairly easy to share libraries between the client and server side of the same project.
